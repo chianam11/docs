@@ -1,6 +1,10 @@
-Redis Client Types trong Node.js
-1. createClient - Client đơn lẻ
-javascript
+# Redis Client Types trong Node.js
+
+---
+
+## 1. createClient - Client đơn lẻ
+
+```javascript
 import { createClient } from 'redis';
 
 const client = createClient({
@@ -8,10 +12,15 @@ const client = createClient({
 });
 
 await client.connect();
-Dùng khi: Kết nối đến một Redis server duy nhất (phổ biến nhất)
+```
 
-2. createCluster - Redis Cluster
-javascript
+**Dùng khi:** Kết nối đến một Redis server duy nhất (phổ biến nhất)
+
+---
+
+## 2. createCluster - Redis Cluster
+
+```javascript
 import { createCluster } from 'redis';
 
 const cluster = createCluster({
@@ -23,18 +32,21 @@ const cluster = createCluster({
 });
 
 await cluster.connect();
-Dùng khi: Làm việc với Redis Cluster (phân tán dữ liệu tự động)
+```
 
-Đặc điểm:
+**Dùng khi:** Làm việc với Redis Cluster (phân tán dữ liệu tự động)
 
-Dữ liệu được sharding tự động
+**Đặc điểm:**
 
-High availability
+* Dữ liệu được sharding tự động
+* High availability
+* Horizontal scaling
 
-Horizontal scaling
+---
 
-3. createSentinel - Sentinel Mode
-javascript
+## 3. createSentinel - Sentinel Mode
+
+```javascript
 import { createSentinel } from 'redis';
 
 const client = createSentinel({
@@ -45,18 +57,21 @@ const client = createSentinel({
   ],
   name: 'mymaster' // Tên master group
 });
-Dùng khi: Cần high availability với Redis Sentinel
+```
 
-Đặc điểm:
+**Dùng khi:** Cần high availability với Redis Sentinel
 
-Tự động failover
+**Đặc điểm:**
 
-Service discovery
+* Tự động failover
+* Service discovery
+* Monitoring
 
-Monitoring
+---
 
-4. createClientPool - Connection Pool
-javascript
+## 4. createClientPool - Connection Pool
+
+```javascript
 import { createClientPool } from 'redis';
 
 const pool = createClientPool({
@@ -74,31 +89,43 @@ try {
 } finally {
   await pool.release(client);
 }
-Dùng khi: Ứng dụng high-throughput cần nhiều connection
+```
 
-Đặc điểm:
+**Dùng khi:** Ứng dụng high-throughput cần nhiều connection
 
-Tránh connection overhead
+**Đặc điểm:**
 
-Quản lý connection hiệu quả
+* Tránh connection overhead
+* Quản lý connection hiệu quả
+* Tối ưu performance
 
-Tối ưu performance
+---
 
-5. So sánh chi tiết
-Loại	Use Case	Ưu điểm	Nhược điểm
-createClient	App nhỏ, single server	Đơn giản, dễ dùng	Single point of failure
-createCluster	Large scale, sharding	Scalability, performance	Phức tạp setup
-createSentinel	High availability	Auto failover, reliable	Cần nhiều server
-createClientPool	High concurrency	Performance, resource management	Code phức tạp hơn
-6. Ví dụ thực tế
-Development/Staging (Dùng createClient)
-javascript
+## 5. So sánh chi tiết
+
+| Loại             | Use Case               | Ưu điểm                    | Nhược điểm              |
+| ---------------- | ---------------------- | -------------------------- | ----------------------- |
+| createClient     | App nhỏ, single server | Đơn giản, dễ dùng          | Single point of failure |
+| createCluster    | Large scale, sharding  | Scalability, performance   | Phức tạp setup          |
+| createSentinel   | High availability      | Auto failover, reliable    | Cần nhiều server        |
+| createClientPool | High concurrency       | Performance, resource mgmt | Code phức tạp hơn       |
+
+---
+
+## 6. Ví dụ thực tế
+
+### Development/Staging (Dùng createClient)
+
+```javascript
 // Đơn giản cho môi trường dev
 const devClient = createClient({
   url: 'redis://localhost:6379'
 });
-Production với High Availability (Dùng Sentinel)
-javascript
+```
+
+### Production với High Availability (Dùng Sentinel)
+
+```javascript
 const productionClient = createSentinel({
   sentinels: [
     { host: '10.0.1.1', port: 26379 },
@@ -107,8 +134,11 @@ const productionClient = createSentinel({
   ],
   name: 'my-master'
 });
-Microservices (Dùng Cluster)
-javascript
+```
+
+### Microservices (Dùng Cluster)
+
+```javascript
 const microserviceClient = createCluster({
   rootNodes: [
     { url: 'redis://cluster-node-1:6379' },
@@ -116,18 +146,25 @@ const microserviceClient = createCluster({
     { url: 'redis://cluster-node-3:6379' }
   ]
 });
-7. Lựa chọn theo nhu cầu
-Bắt đầu/Dev: createClient
+```
 
-Production cơ bản: createClient + replication
+---
 
-High traffic: createClientPool
+## 7. Lựa chọn theo nhu cầu
 
-Enterprise scale: createCluster hoặc createSentinel
+* Bắt đầu/Dev: **createClient**
+* Production cơ bản: **createClient + replication**
+* High traffic: **createClientPool**
+* Enterprise scale: **createCluster** hoặc **createSentinel**
 
-8. Các constants khác
-CLUSTER SLOT_STATES: Trạng thái slots trong cluster
+---
 
-CommandTimeoutDuringMaintenanceError: Lỗi timeout khi cluster bảo trì
+## 8. Các constants khác
 
-Khuyến nghị: Bắt đầu với createClient trước, khi cần scale thì chuyển sang các options khác.
+* **CLUSTER SLOT_STATES:** Trạng thái slots trong cluster
+* **CommandTimeoutDuringMaintenanceError:** Lỗi timeout khi cluster bảo trì
+
+---
+
+**Khuyến nghị:**
+Bắt đầu với `createClient` trước, khi cần scale thì chuyển sang các options khác.
